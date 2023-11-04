@@ -1,0 +1,48 @@
+
+GENERALIZED PROCRUSTES ANALYSIS TOOLBOX
+
+The Generalized Procrustes Analysis Toolbox offers a ready-to-use matlab interface for aligning shape data.  
+The implementation allows the user to test the Stratified approach in its different variants for affine, 
+euclidean and similarity transformations. It also includes the classical alternation approach for similarities 
+and euclidean transformations. In all cases it is possible to indicate missing data in the shapes.
+
+To install the toolbox just add the directory SGPAv1.0 and its subdirectories to your current path variable.
+
+
+The main Matlab function to access all methods has the following syntax.
+
+T=gpa(D,V,options)
+
+
+See gpa.m for more details. 
+
+
+Example files
+
+experiments/example.m  is an easy example of how to use the gpa function with random data. 
+
+experiments/runexperiments.m allows the user to recreate all experiments showed in the paper with synthetic data.
+
+experiments/exp2DFaceDataset.m allows the user to recreate the results obtained with the 2D Face Dataset. 
+
+
+
+ Copyright (C)2010  Adrien Bartoli (1), Daniel Pizarro (2) and Marco Loog (3)
+ (1) Clermont Université - Clermont-Ferrand, France.
+ (2) Universidad de Alcala- Alcala de Henares, Spain
+ (3) Delft University - Nederlands
+ Send bug reports and feedback to: dani.pizarro@gmail.com
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

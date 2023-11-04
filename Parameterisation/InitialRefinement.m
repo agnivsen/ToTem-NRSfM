@@ -1,5 +1,5 @@
 
-function [interpolated_data, T, cleaned_data]...
+function [interpolated_data, T, cleaned_data, warpInfo]...
     = InitialRefinement(parameterised_reconstruction_target, visibility, max_iter, topology, NA_Model,... 
                                             alpha_param, beta_param, interpolation_density, padding, debugDisplay, cylinderReferenceVector)
 
@@ -35,7 +35,7 @@ function [interpolated_data, T, cleaned_data]...
     alpha = alpha_param;
     beta = beta_param;
 
-    [parameterised_reconstruction_target, ~] = remove_invalid_points(parameterised_reconstruction_target, visibility);
+    [parameterised_reconstruction_target, discardedList] = remove_invalid_points(parameterised_reconstruction_target, visibility);
 
     if( (topology == 1) && exist('cylinderReferenceVector', 'var'))
         [aligned_reconstruction_g, r, C, T] = align.align_pointcloud(parameterised_reconstruction_target, cylinderReferenceVector);
@@ -94,6 +94,11 @@ function [interpolated_data, T, cleaned_data]...
     end
 
     fprintf('\n-------: Finished doing <strong>initial parameterization</strong>:-------\n\n');
+
+    warpInfo.discardedList = discardedList;
+    warpInfo.xi = xi;
+    warpInfo.Linv = Linv;
+    warpInfo.template = template;
 end
 
 function [E,J] = error(data)
