@@ -28,7 +28,7 @@ We present a Non-Rigid Structure-from-Motion (NRS*f*M) method to reconstruct an 
 
 ## Dependencies
 
-The following are the dependencies for the code (included in the 'Data' folder):
+The following are the dependencies for the code (included in the 'Dependencies' folder):
 
 - [CrustOpen](mathworks.com/matlabcentral/fileexchange/63731-surface-reconstruction-from-scattered-points-cloud-open-surfaces): based on [Bernardini et al, 1999]
 - Generalized Procrustes Analysis (GPA): based on [[Bai et al., 2022]](https://encov.ip.uca.fr/publications/pubfiles/2021_Bai_etal_IJCV_defgpa.pdf)
