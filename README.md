@@ -67,6 +67,6 @@ Our article has been recently accepted by the International Journal of Computer 
 
  **References**
 
-[Bernardini et al, 1999]: Bernardini, F., Mittleman, J., Rushmeier, H., Silva, C., & Taubin, G. (1999). The ball-pivoting algorithm for surface reconstruction. IEEE transactions on visualization and computer graphics, 5(4), 349-359.
+[Bernardini et al, 1999]: Bernardini, F., Mittleman, J., Rushmeier, H., Silva, C., & Taubin, G. (1999). The ball-pivoting algorithm for surface reconstruction. _IEEE transactions on visualization and computer graphics_, 5(4), 349-359.
 
-[Bai et al., 2022]: Bai, Fang, and Adrien Bartoli. "Procrustes analysis with deformations: A closed-form solution by eigenvalue decomposition." International Journal of Computer Vision (2022): 1-27.
+[Bai et al., 2022]: Bai, Fang, and Adrien Bartoli. "Procrustes analysis with deformations: A closed-form solution by eigenvalue decomposition." _International Journal of Computer Vision_ (2022): 1-27.
