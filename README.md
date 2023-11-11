@@ -48,6 +48,7 @@ The code provided in this repository has been tested on the following platforms:
 - Matlab 2022a on Windows 11
 - Matlab 2022b on Ubuntu 20.04 LTS (Focal Fossa)
 
+_(Please submit an 'issue' if you face any problems with installing the code or executing the scripts. We will try to address them as soon as possible.)_
 
 ## Citation
 
