@@ -52,7 +52,6 @@ classdef WTT %< handle
 
                [r, theta] = obj.flattened_coordinates(P_t(1,1), P_t(1,2), P_t(1,3));
                [Nx(i,1), Ny(i,1), Nz(i,1), lambda_r_prio, lambda_theta_prio, phi_r, phi_theta] = obj.get_normal(A, d, control_handles, r, theta, N_control);
-%                [E(i,1), phi_rr, phi_tt, phi_rt] = obj.get_bending_energy(A, d, control_handles, r, theta, N_control);
                
                if(jacobian_mode == 0) % computing jacobian stuff for init. parameterisation
                     [J1, dN_dY] = obj.compute_jacobian_geometric(Linv, N_control, theta, lambda_r_prio, lambda_theta_prio,...
@@ -62,16 +61,9 @@ classdef WTT %< handle
                     jacobian_components.second_term(i).data = dN_dY;
                else % computing jacobian stuff for global refinement
                    
-%                    fprintf('FATAL ERROR: worng option for type of Jacobian required! Code will crash soon.');
                     jacobian_components = 0;
                end
                
-%                E(i,1) = 0;
-%                [E_] = obj.get_bending_energy_3D(A, control_handles, P_t(1,1), P_t(1,2), P_t(1,3), ... 
-%                                                                 Phi_t, N_control);
-%                E(index,1) = E_(1,1); index = index + 1;
-%                E(index,1) = E_(1,2); index = index + 1;
-%                E(index,1) = E_(1,3); index = index + 1;
                Px(i,1) = fp(1,1);
                Py(i,1) = fp(1,2);
                Pz(i,1) = fp(1,3);
@@ -151,7 +143,6 @@ classdef WTT %< handle
             Nz = zeros(N_test, 1, 'like', speye(3));
             E =   zeros(N_test, 1, 'like', speye(3));
             C = zeros(N_test,1, 'like', speye(3));
-%             jacobian_components = 0; %%%-> remove this!
             
             dQ_dxi = zeros(N_test, (12*N_test), 'like', speye(3));
             
@@ -173,22 +164,12 @@ classdef WTT %< handle
             for i = 1:N_test
                P_t = ones(1, 4, 'double');
                
-% % % %                r = template(i,2);
-% % % %                theta = template(i,1);
-% % % %                theta = rad2deg(theta);
-% % % %                
-% % % %                
-% % % %                P_t(1,1) = sin(theta);
-% % % %                P_t(1,2) = r;
-% % % %                P_t(1,3) = cos(theta);
 
                P_t(1,1) = template(i,1);
                P_t(1,2) = template(i,2);
                P_t(1,3) = template(i,3);
                [r, theta] = obj.flattened_coordinates(P_t(1,1), P_t(1,2), P_t(1,3));
                
-% % % %                fprintf('%0.4f %0.4f %0.4f\n',P_t(1,1),P_t(1,2),P_t(1,3));
-% % % %                fprintf('%0.4f \n',theta);
 
                Phi_t = zeros(1, N_control, 'like', speye(3));
               
@@ -203,11 +184,7 @@ classdef WTT %< handle
                A = sparse(A);
                
                fp = (P_t*d) + (Phi_t*A);       
-% % % %                fprintf('%0.4f %0.4f %0.4f\n',fp(1,1),fp(1,2),fp(1,3));
-
-% % % %                [r, theta] = obj.cylindrical_coordinates_Yaligned_forward(P_t(1,1), P_t(1,2), P_t(1,3));
                [Nx(i,1), Ny(i,1), Nz(i,1), lambda_r_prio, lambda_theta_prio, phi_r, phi_theta, N_norm, cT, sT] = obj.get_normal(A, d, source_points, r, theta, N_control);
-% % % %                [E(i,1), phi_rr, phi_tt, phi_rt] = obj.get_bending_energy(A, d, control_handles, r, theta, N_control);
 
                     [J1, d_hatN_dXi, dN_dXi] = obj.compute_jacobian_geometric(Linv, N_control, theta, lambda_r_prio, lambda_theta_prio,...
                         phi_r, phi_theta, Nx(i,1), Ny(i,1), Nz(i,1), P_t(1,1), P_t(1,2), P_t(1,3), Phi_t);
@@ -230,25 +207,6 @@ classdef WTT %< handle
                 denom_norm = ((Nx(i,1)*N_norm)^2 + (Ny(i,1)*N_norm)^2 + (Nz(i,1)*N_norm)^2);
                 C(i,1) = (numer/denom_norm);
                 
-                %%%% test code
-% % % %                 NtN = hat_N*hat_N.';
-% % % %                 numer = (phi_rr*NtN*phi_theta_theta.') - (phi_r_theta*NtN*phi_r_theta.');
-% % % %                 denom_norm = ((Nx(i,1)*N_norm)^2 + (Ny(i,1)*N_norm)^2 + (Nz(i,1)*N_norm)^2);
-% % % %                 C_test1 = (numer/denom_norm);
-% % % %                 
-% % % %                 L = dot(phi_rr, hat_N);
-% % % %                 M = dot(phi_r_theta, hat_N);
-% % % %                 N = dot(phi_theta_theta, hat_N); % problem with either L, M or N
-% % % %                 
-% % % %                 E_ = (phi_r(1,1).^2 + phi_r(1,2).^2 + phi_r(1,3).^2);
-% % % %                 F_  =  (phi_r(1,1)*phi_theta(1,1)) + (phi_r(1,2)*phi_theta(1,2)) + (phi_r(1,3)*phi_theta(1,3));
-% % % %                 G_ = (phi_theta(1,1).^2 + phi_theta(1,2).^2 + phi_theta(1,3).^2);
-% % % %                 
-% % % %                 C_test2 = ((L*N) - (M*M)) / ((E_*G_) - (F_*F_));
-% % % %                 
-% % % %                 fprintf('%d %d %d\n',C(i,1), C_test1, C_test2);
-                %%% test code ends
-                
                 
                 %%%% Curvature Jacobian computation %%%
                 xi_block_top = xi_block(1:end-4,:);
@@ -264,13 +222,9 @@ classdef WTT %< handle
                 a9 = xi_block_bottom(1,(2*l)+1:3*l); a11 = xi_block_bottom(3,(2*l)+1:3*l);
                 a13 = xi_block_bottom(1,(3*l)+1:4*l); a15 = xi_block_bottom(3,(3*l)+1:4*l);
                 
-%                 d_Ng_2_dXi = horzcat(((a1*sT) + (a3*cT)), ((a5*sT) + (a7*cT)), ((a9*sT) + (a11*cT)), ((a13*sT) + (a15*cT)));                
-%                 d_phi_thetaThetaT_d_xi =  (Ng_rho*xi_block_top) - d_Ng_2_dXi;
-
                  d_Ng_2_dXi = vertcat(((a1*sT) + (a3*cT)), ((a5*sT) + (a7*cT)), ((a9*sT) + (a11*cT)), ((a13*sT) + (a15*cT)));
                 d_phi_thetaTheta_d_xi = d_phi_rrT_dxi_part1*(kron(Ng_rho.',speye(l))) - d_Ng_2_dXi;
                 
-%                 d_phi_rr_dxi = d_phi_rrT_dxi_part1*(kron(Lg_rho.',eye(l)));
                 d_phi_rTheta_dxi = d_phi_rrT_dxi_part1*(kron(Mg_rho.',speye(l)));
                 
                 dN_dXi_flat = horzcat(d_hatN_dXi(1,:), d_hatN_dXi(2,:),  d_hatN_dXi(3,:),  d_hatN_dXi(4,:));
@@ -296,9 +250,6 @@ classdef WTT %< handle
                 dC_dXi_row = (1/N_norm.^4) * ( ( N_norm.^2 *  d_alphaK_d_xi ) -  ( numer * d_phiR_cross_phiTheta_dXi )  );
                 dC_dXi(i,:) = dC_dXi_row;
                 
-                %%%% Curvature Jacobian computation %%%
-% % % %                 
-% % % %                 fprintf('Curvature:\t%0.4f\t%0.4f\n',C(i,1),(numer/denom_norm));
 
                 jacobian_components.dQ_dk1(i).data = dQ_dk1;
                 jacobian_components.dRho_dk(i).data = dRho_dk;
@@ -366,7 +317,6 @@ function [dQ_dk1, dQ_dxi, dRho_dk, dSin_dk, dR_dk, dCos_dk, Lg_rho, Mg_rho, Ng_r
 %         fprintf('%d %d\n',r,theta);
         
         for i = 1:N_control % -> possible issue with indices
-%             fprintf('\n\n[WTT.m:compute_jacobian_global] -> BIG PROBLEM with dRho_dk (j is a constant index), FIX needed!!!\n\n')
             dRho_dk(1, ((i-1)*N_control) + j) = -((r - control_handles(j,2))/phi(1,i));
             dRho_dk(1, ((i-1)*N_control) + (N_control + j)) = -( ((control_handles(j,3) * sin(theta)) - (control_handles(j,1) * cos(theta)))/phi(1,i) );
             
@@ -426,12 +376,7 @@ end
         delA2 = delta_a_delta_Y(2,:);
         delA3 = delta_a_delta_Y(3,:);
         
-%         a1 = delta_a_delta_Y(1,1:(3*N_control)); a5 = delta_a_delta_Y(1,(3*N_control+1):(6*N_control)); a9 = delta_a_delta_Y(1,(6*N_control+1):(9*N_control)); a13 = delta_a_delta_Y(1,(9*N_control+1):(12*N_control));
-%         a3 = delta_a_delta_Y(3,1:(3*N_control)); a7 = delta_a_delta_Y(3,(3*N_control+1):(6*N_control)); a11 = delta_a_delta_Y(3,(6*N_control+1):(9*N_control)); a15 = delta_a_delta_Y(3,(9*N_control+1):(12*N_control));
-        
         delA_theta = vertcat(delA1, delA3);
-        
-%         angular_component_augmented = kron(angular_component, eye((3*N_control),(3*N_control)));
         
         
         del_r_del_Y = delA2 + (lambda_r_prio * bar_xi_lambda * block_matrix_top);
@@ -444,7 +389,6 @@ end
         del_theta_del_Y = del_theta_del_Y_1 + del_theta_del_Y_2;
         
         phi_r_skew = [0 -phi_r(3) phi_r(2) ; phi_r(3) 0 -phi_r(1) ; -phi_r(2) phi_r(1) 0 ];
-%         phi_theta_skew = [0 -phi_theta(3) phi_theta(2) ; phi_theta(3) 0 -phi_theta(1) ; -phi_theta(2) phi_theta(1) 0 ];
 
 
         del_r_del_Y_x = del_r_del_Y(1:(3*N_control));
@@ -528,7 +472,6 @@ end
             
             if(isnan(norm(E)))
                 E = zeros(1,4);
-                %warning('Bending energy is zero. This may happen for vertices lying on the seam of the planar surface');
            end
         end
         
@@ -561,12 +504,10 @@ end
                U_t = obj.U( xC - sT, yC - r, zC - cT );
                
                
-%                Phi_rr_prio(1,j) =   ((U_t).^2 - 2*( yC - r)) / (U_t).^3;
                Phi_rr_prio(1,j) =   ((U_t).^2 - ( r - yC).^2) / (U_t).^3;
                
                Phi_tt_prio_2(1,j) = ((U_t).^2*((zC*cT) + (xC*sT)) - (((zC*sT) - (xC*cT)).^2))/(U_t).^3;
                
-%                Phi_rt_prio(1,j) =   (((zC*sT - xC*cT) - (r - yC))*(r - yC)) / (U_t).^(3/2);
                Phi_rt_prio(1,j) =  - (((zC*sT - xC*cT))*(r - yC)) / (U_t).^(3);
            end
            
@@ -584,12 +525,8 @@ end
            
            if(isnan(E))
                 E = 0;
-               % warning('Bending energy is zero. This may happen for vertices lying on the seam of the planar surface');
            end
            
-           %display('Dim of E');
-           %display(size(E));
-           %display((Phi_tt).^2);
            
         end
         
@@ -631,7 +568,6 @@ end
                 Y(i,4) = 1.0;
             end
             
-%             fprintf('Rank: %d, rows %d\n',rank(K),N);
             
             Kinv = pinv(K);
             
@@ -666,11 +602,9 @@ end
                     return;
             end
             
-%             Uncomment this (VERY IMPORTANT!)
             E = Y(1:N,1).'*xi*Y(1:N,1) + Y(1:N,2).'*xi*Y(1:N,2) + Y(1:N,3).'*xi*Y(1:N,3);
             J = zeros(1,(3*N));
             
-%             E = 0; %%% ----> DELETE this!
             
             dYxT_dY = zeros(1,(3*N*N));
             dYyT_dY = zeros(1,(3*N*N));
@@ -692,7 +626,6 @@ end
                 step = step + 1;
             end
             
-%             Uncomment this (VERY IMPORTANT!)
             J(1,:) = ( dYxT_dY * kron((xi*Y(1:N,1)), ones_block_thrice) + Y(1:N,1).'*xi*dYx_dY + ...
                         dYyT_dY * kron((xi*Y(1:N,2)), ones_block_thrice) + Y(1:N,2).'*xi*dYy_dY + ...
                         dYzT_dY * kron((xi*Y(1:N,3)), ones_block_thrice) + Y(1:N,3).'*xi*dYz_dY );
@@ -700,27 +633,6 @@ end
         end
 
 
-        %%
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %  Find the r, theta coordinates of a point lying on the right circular   %
-        %  cylinder, assuming their principle axis aligns with the Y-axis and     %
-        %  passes through the origin                                              % 
-        %                                                                         %
-        % @param: X, Y, Z - cartesian coordinates                                 %
-        %                                                                         % 
-        % @return: [r, theta] - computed values                                   %
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %         function [r, theta] = cylindrical_coordinates_Yaligned_forward(obj, X, Y, Z)
-% %             r = Y;
-% %             dot_pr = (0*X) + (Z*1);
-% %             norm_u = sqrt(1);
-% %             norm_v = sqrt((X*X) + (Z*Z));
-% %             CosTheta = dot_pr/(norm_u*norm_v);
-% %             theta = acosd(CosTheta);    
-% %             if(X < 0)
-% %                 theta = 360.0 -theta;
-% %             end
-% %         end
 
         function [r, theta] = flattened_coordinates(obj, X, Y, Z)
             r = Y;
@@ -732,12 +644,6 @@ end
             if(X < 0)
                 theta = 360.0 -theta;
             end
-%             fprintf('%d %d %d\n', X, Z, theta);
-%             if(X > 0)
-%                 theta = 360.0 -theta;
-%             end
-%             theta = -theta;
-%             theta = deg2rad(theta);
         end
 
 
@@ -817,7 +723,6 @@ end
         %%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %  U value for the TPS                                                    %
-        %  CAUTION: This is just a L2 norm function, and not the complete U value %
         %  The call to this function needs to handle generating the U value
         %  
         % @param: x,y, z - cartesian coordinates of the point                     %
@@ -962,8 +867,6 @@ end
         end
         
         
-        %%
-%         Factorises the input (N) into three integers, the product of which equals to the input 'N' (if possible)
         function [num_X, num_Y, num_Z] = factorise_pointcloud_size(obj, N)
             
             F = factor(N);
@@ -991,177 +894,6 @@ end
         end
         
 
-
-        %% EXPERIMENTS with a cylinder in 3D
-        % Call from runme_exp1.m -> uncomment the last two lines (while
-        % commenting out the rest)
-        function example(obj)
-            formatSpec = '%f %f %f';
-            sizeData = [3 Inf];
-            fileID_ip = fopen('data/additional/HighDensity.xyz','r'); 
-            control_handles = fscanf(fileID_ip,formatSpec,sizeData);
-            fclose(fileID_ip);
-            fileID_target = fopen('data/SDP_Quadrics/test_piece_rot.xyz','r'); 
-            control_handle_target = fscanf(fileID_target,formatSpec,sizeData);
-            fclose(fileID_target);
-            
-            control_handles = control_handles';
-            control_handle_target = control_handle_target';                        
-
-            dim = size(control_handles);
-            N = dim(1);
-
-            dim_target = size(control_handle_target);
-            N_target = dim_target(1);
-            
-            
-%             [n_x, n_y, n_z] = obj.factorise_pointcloud_size(N_target);
-            
-            base = obj.find_correspondence_natural(control_handle_target, N_target);
-
-            [A, d, Linv, xi] = obj.compute_tps(base, control_handle_target, N_target);             
-
-            
-%             [n_x, n_y, n_z] = obj.factorise_pointcloud_size(N);
-            
-            base2 = obj.find_correspondence_natural(control_handles, N);
-                                    
-            for index = 1:30                   
-            
-             %% OBSERVATIONS:
-                %%% -> Moving control handle (control_handle_target) works for sure
-                %%% moving the base (base2) works as well
-                %%% but moving the other target (base) does NOT work at all
-                %%% also: there is difference between moving control handle
-                %%% vs base, i.e., control handle -> more obvious; base ->
-                %%% subtle.
-                %%% -> 'interpolate_tps' could be used for interpolating
-                %%% high-resolution template, check method comments on top.
-                %%% -> Preferable to control deformation using control handle
-                %%% (control_handle_target) for proper normal estimation,
-                %%% i.e., moving the control handle is better for normals
-                %%% -> So the two pointcloud arguments of interpolate_tps are best kept
-                %%% the same (later shown, not necesssarily)
-             %%
-%                 if(index<11)
-%                     axis = 1;
-%                     for s_index = 1:10
-%                         control_handle_target(s_index,axis) = control_handle_target(s_index,axis) + 0.01;
-%                     end
-%                 elseif((index > 10) && (index < 21))
-%                     axis = 2;
-%                     for s_index = 1:10
-%                         control_handle_target(s_index,axis) = control_handle_target(s_index,axis) + 0.01;
-%                     end
-%                 elseif((index > 20))
-%                     axis = 3;
-%                     for s_index = 1:10
-%                         control_handle_target(s_index,axis) = control_handle_target(s_index,axis) + 0.01;
-%                     end
-%                 end                                        
-
-%                 if(index<11)
-%                     axis = 1;
-%                     for s_index = 1:10
-%                         base2(s_index,axis) = base2(s_index,axis) + 0.01;
-%                     end
-%                 elseif((index > 10) && (index < 21))
-%                     axis = 2;
-%                     for s_index = 1:10
-%                         base2(s_index,axis) = base2(s_index,axis) + 0.01;
-%                     end
-%                 elseif((index > 20))
-%                     axis = 3;
-%                     for s_index = 1:10
-%                         base2(s_index,axis) = base2(s_index,axis) + 0.01;
-%                     end
-%                 end       
-
-%                      base2(15,3) = base2(15,3) + 0.02;
-%                      control_handle_target(15,3) = control_handle_target(15,3) + 0.001;
-
-                [A, d, E, J] = obj.update_tps(control_handle_target, Linv, xi, N_target);
-                
-                base2(20:2180,:) = [];
-                N = obj.length_matrix(base2);
-                    
-                [Px, Py, Pz, Nx, Ny, Nz, E, jacobian_components, dQ_dxi, C] = obj.interpolate_tps_global(A, d, base2, ...
-                                                                        base, N, N_target, xi, Linv, 1);
-                                                                    
-                data_post = horzcat(Px, Py, Pz, Nx, Ny, Nz);
-                
-                 [data_post] = obj.color_data_with_curvature(data_post, C);
-                                                                    
-                final_path = strcat('/home/agniva/Documents/figures/Adrien_W8.21/TPS_Interpolation/test_',num2str(index),'.xyz');
-
-                fileID_OP = fopen(final_path,'w');                                                                
-                for i = 1:N
-                   fprintf(fileID_OP,'%5d %5d %5d %5d %5d %5d\n', Px(i,1), Py(i,1), Pz(i,1), ...
-                                                                 Nx(i,1), Ny(i,1), Nz(i,1) );
-                end
-                fclose(fileID_OP);
-                
-                base_path = strcat('/home/agniva/Documents/figures/Adrien_W8.21/TPS_Interpolation/base_',num2str(index),'.xyz');
-
-                fileID_OP = fopen(base_path,'w');                                                                
-                for i = 1:N_target
-                   fprintf(fileID_OP,'%5d %5d %5d\n',control_handle_target(i,1), control_handle_target(i,2), control_handle_target(i,3));
-                end
-                fclose(fileID_OP);
-                
-            end
-
-        end
-        
-        function [rotated_data] = color_data_with_curvature(obj, data, curvature)
-
-            should_paint_curvature = 1;
-            if ~exist('curvature','var')
-                should_paint_curvature = 0;
-            end
-%             for frame = 1:N_frames
-                size = obj.length_matrix(data);
-                
-                if(should_paint_curvature == 1)
-                    C = abs(curvature);
-                    C(C<0.19)  = 0; % thresholding out small curvatures
-                    m = min(C(:));
-                    C = (C(:)-m)/(max(C(:))-m)*10000;
-                end
-
-                for index = 1: size
-                    P = zeros(3,1);
-                    P(1,1) = data(index,1);
-                    P(2,1) = data(index,2);
-                    P(3,1) = data(index,3);
-                    rotated_data_temp(index,1) = P(1,1);
-                    rotated_data_temp(index,2) = P(2,1);
-                    rotated_data_temp(index,3) = P(3,1);
-
-                    if(should_paint_curvature == 1)
-                        N = zeros(3,1);
-                        N(1,1) = data(index,4);
-                        N(2,1) = data(index,5);
-                        N(3,1) = data(index,6);
-                        rotated_data_temp(index,4) = N(1,1);
-                        rotated_data_temp(index,5) = N(2,1);
-                        rotated_data_temp(index,6) = N(3,1);           
-                        if(C(index) > 255)
-                            val = 255;
-                        else
-                            val = C(index);
-                        end
-                        rotated_data_temp(index,7) = val;
-                        rotated_data_temp(index,8) = 0;%255.0 - C(index);
-                        rotated_data_temp(index,9) = 0;%C(index);
-                        rotated_data_temp(index,10) = 1.0;
-                    end
-                end
-                rotated_data = rotated_data_temp;
-%             end
-
-        end
-        
         function [N] = length_matrix(obj, X)
             N = size(X);
             N = N(1);

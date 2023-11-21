@@ -51,7 +51,7 @@ synth = synth.setMaxTrainingFeatures(NUM_TRAINING_FEATURES);
 synth = synth.setMaxTestFeatures(1000000000);
 [DataSubsampled, TestData, K] = synth.simulateSyntheticData();
 
-nFiles = 3;%size(DataSubsampled.p,2);
+nFiles = size(DataSubsampled.p,2);
 nPts = size(DataSubsampled.p(1).p,2);
 
 [nng] = getNeighborhoodDuplicated(DataSubsampled,nK);

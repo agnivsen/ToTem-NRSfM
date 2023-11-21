@@ -253,9 +253,6 @@ classdef WST <handle
             
             if(mode == 1) % primarily used for global refinement
                 
-                %%% This code block if for initialising Gaussian curvature related
-                %%% ...vectors and matrices
-
                 dYT_dxi = zeros(4,(3*N_control));
                 offset = 0;
                 
@@ -474,25 +471,18 @@ classdef WST <handle
                 delA2 = delta_a_delta_Y(2,:);
                 delA3 = delta_a_delta_Y(3,:);
                 
-                %         a1 = delta_a_delta_Y(1,1:(3*N_control)); a5 = delta_a_delta_Y(1,(3*N_control+1):(6*N_control)); a9 = delta_a_delta_Y(1,(6*N_control+1):(9*N_control)); a13 = delta_a_delta_Y(1,(9*N_control+1):(12*N_control));
-                %         a3 = delta_a_delta_Y(3,1:(3*N_control)); a7 = delta_a_delta_Y(3,(3*N_control+1):(6*N_control)); a11 = delta_a_delta_Y(3,(6*N_control+1):(9*N_control)); a15 = delta_a_delta_Y(3,(9*N_control+1):(12*N_control));
-                
                 delA_theta = vertcat(delA1, delA2, delA3);
-                
-                %         angular_component_augmented = kron(angular_component, eye((3*N_control),(3*N_control)));
                 
                 
                 del_r_del_Y = angular_component1*delA_theta + (lambda_r_prio * bar_xi_lambda * block_matrix_top);
                 
                 
-                %         del_theta_del_Y_1 = delA_theta * angular_component_augmented;
                 del_theta_del_Y_1 = angular_component2*delA_theta;
                 del_theta_del_Y_2 = lambda_theta_prio * bar_xi_lambda * block_matrix_top;
                 
                 del_theta_del_Y = del_theta_del_Y_1 + del_theta_del_Y_2;
                 
                 phi_r_skew = [0 -phi_r(3) phi_r(2) ; phi_r(3) 0 -phi_r(1) ; -phi_r(2) phi_r(1) 0 ];
-                %         phi_theta_skew = [0 -phi_theta(3) phi_theta(2) ; phi_theta(3) 0 -phi_theta(1) ; -phi_theta(2) phi_theta(1) 0 ];
                 
                 
                 del_r_del_Y_x = del_r_del_Y(1:(3*N_control));
@@ -578,7 +568,6 @@ classdef WST <handle
                 Ng_rho = zeros(1, N_control);
                 Ng_2 = zeros(1, 4);
                 
-                %         fprintf('%d %d\n',r,theta);
                 
                 P_canonical = [X_ Y_ Z_];
                 [delta_theta_1, delta_theta_2] = obj.cartesian_coordinates_first_derivative(theta1, theta2);
@@ -595,16 +584,11 @@ classdef WST <handle
                     Cy = control_handles(i,2);
                     Cz = control_handles(i,3);
                     
-%                     Lg_rho(1,i) = ( phi(1,i).^2 - (theta1 - Cy).^2 )/( phi(1,i).^3 ); %-> old       
                     diff_C = (control_handles(i,:) - P_canonical);
                     Lg_rho(1,i) = ( phi(1,i).^2 * ( dot( diff_C , delta_theta1_theta1 ) + dot( delta_theta_1 , delta_theta_1 ) ) -  dot( diff_C , delta_theta_1 ) ) / phi(1,i).^3;
                     
-%                     Mg_rho(1,i) = ( - ( (theta1 - Cy)*( (Cz * sin(theta2)) - (Cx * cos(theta2)) ) ) )/( phi(1,i).^3 );
-
                     Mg_rho(1,i) = phi(1,i).^2 * (dot(diff_C, delta_theta1_theta2) + dot(delta_theta_1, delta_theta_2)) - (diff_C*diff_C.'*delta_theta_1*delta_theta_2.');
                     
-%                     Ng_rho(1,i) =  ( phi(1,i).^2*( (Cz*cos(theta2)) + (Cx*sin(theta2)) )...
-%                         - ( (Cz * sin(theta2)) - (Cx * cos(theta2)) ).^2 )/ (phi(1,i).^3);
 
                     Ng_rho(1,i) = ( phi(1,i).^2 * ( dot( diff_C , delta_theta2_theta2 ) + dot( delta_theta_2 , delta_theta_2 ) ) -  dot( diff_C , delta_theta_2 ) ) / phi(1,i).^3;
                 end
@@ -820,66 +804,5 @@ classdef WST <handle
                 cT = cos(theta); sT = sin(theta);
             end
             
-            %% EXPERIMENTS with a sphere in 3D
-            function example(obj)
-                formatSpec = '%f %f %f';
-                sizeData = [3 Inf];
-                %fileID = fopen('../../data/tps_experiments/Cylinder.xyz','r');
-                %fileID_ip = fopen('../../data/tps_experiments/3D_experiments/test1/undef.xyz','r');
-                %             fileID_ip = fopen('../../data/tps_experiments/bending_energy/undef.xyz','r');
-                %             control_handles = fscanf(fileID_ip,formatSpec,sizeData);
-                %             fclose(fileID_ip);
-                fileID_target = fopen('data/SphericalTest/test_sphere.xyz','r');
-                control_handle_target = fscanf(fileID_target,formatSpec,sizeData);
-                fclose(fileID_target);
-                
-                control_handle_target = control_handle_target';
-                
-                dim = size(control_handle_target);
-                N = dim(1);
-                
-                
-                control_handles = obj.find_correspondence_natural(control_handle_target, N, 1);
-                
-                %control_handles = control_handles';
-                
-                
-
-                
-                dim_target = size(control_handles);
-                N_target = dim(1);
-                
-                if(N~=N_target)
-                    display('Mismatching dimension between reference and target');
-                    display(N);
-                    display(N_target);
-                    exit;
-                end
-                
-                [A, d, Linv, xi] = obj.compute_tps(control_handles, control_handle_target, N);
-                
-                %             %fileID_test = fopen('../../data/tps_experiments/3D_experiments/test1/test.xyz','r');
-                %             fileID_test = fopen('../../data/tps_experiments/bending_energy/undef.xyz','r');
-                interpolation_candidate_vertices = obj.find_correspondence_natural(control_handle_target, N_target, 1);%fscanf(fileID_test,formatSpec,sizeData);
-                %             fclose(fileID_test);
-                
-                %interpolation_candidate_vertices = interpolation_candidate_vertices';
-                
-                dim_test = size(interpolation_candidate_vertices);
-                N_test = dim_test(1);
-                
-                [X_test, Y_test, Z_test, Nx_test, Ny_test, Nz_test, E] = obj.interpolate_tps( ...
-                    A, d, interpolation_candidate_vertices, ...
-                    control_handles, N_test, N, xi, Linv, 0);
-                
-                fileID_OP = fopen('data/op/op_sphere.xyz','w');
-                
-                for i = 1:N_test
-                    fprintf(fileID_OP,'%5d %5d %5d %5d %5d %5d\n',X_test(i,1), Y_test(i,1), Z_test(i,1), ...
-                        Nx_test(i,1), Ny_test(i,1), Nz_test(i,1) );
-                end
-                fclose(fileID_OP);
-                display(norm(E));
-            end
         end
     end
