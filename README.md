@@ -50,6 +50,21 @@ The code provided in this repository has been tested on the following platforms:
 
 _(Please submit an 'issue' if you face any problems with installing the code or executing the scripts. We will try to address them as soon as possible.)_
 
+## Data format
+
+All data have been provided in standard NRSfM/SfT format, we explain it below:
+
+Say the data contains _n_ images tracking up to _m_ feature correspondences across images.
+
+The data is a MATLAB _struct_, say <Data>. It contains the following subfields:
+
+* Data.Pgth(i).P is a [3 x _m_] matrix, containing 3D groundtruth points, for all _i_ in [1, _n_]
+
+* Data.p(i).p is a [2 x _m_] or [3 x _m_] matrix, containing tracked point correspondences (image coordinates), for all _i_ in [1, _n_]. If the matrix is of size [3 x _m_], the last row is necessarily all ones
+
+* Data.v is a [_n_ x _m_] matrix which is zero if a point (indexed by column) is invisible at that particular image corresponding to the row number, one otherwise.
+
+
 ## Citation
 
 Our article has been recently accepted by the International Journal of Computer Vision (IJCV) and is still in press. If you find this code useful, you may cite the pre-print available at:
