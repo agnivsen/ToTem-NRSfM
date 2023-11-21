@@ -56,7 +56,7 @@ All data have been provided in standard NRSfM/SfT format, we explain it below:
 
 Say the data contains _n_ images tracking up to _m_ feature correspondences across images.
 
-The data is a MATLAB _struct_, say <Data>. It contains the following subfields:
+The data is a MATLAB _struct_, say **Data**. It contains the following subfields:
 
 * Data.Pgth(i).P is a [3 x _m_] matrix, containing 3D groundtruth points, for all _i_ in [1, _n_]
 
