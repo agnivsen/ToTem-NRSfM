@@ -67,17 +67,27 @@ The data is a MATLAB _struct_, say **Data**. It contains the following subfields
 
 ## Citation
 
-Our article has been recently accepted by the International Journal of Computer Vision (IJCV) and is still in press. If you find this code useful, you may cite the pre-print available at:
+Our article was accepted at the International Journal of Computer Vision (IJCV) in 2024. If you find this code or the associated paper useful, you may cite the article with:
 
+#### Bibtex:
 ```
-@article{sengupta2023totem,
+@article{sengupta2024totem,
   title={ToTem NRSfM: Object-wise Non-Rigid Structure-from-Motion with a Topological Template},
   author={Sengupta, Agniva and Bartoli, Adrien},
   journal={International Journal of Computer Vision},
-  URL = {https://encov.ip.uca.fr/publications/pubfiles/2023_Sengupta_etal_IJCV_topological.pdf}
-  year={2023}
+  pages={1--42},
+  year={2024},
+  publisher={Springer}
 }
 ```
+
+#### APA:
+```
+Sengupta, A., & Bartoli, A. (2024). ToTem NRSfM: Object-wise Non-Rigid Structure-from-Motion with a Topological Template. International Journal of Computer Vision, 1-42.
+```
+
+Pre-print and additional datasets are also available at the EnCoV research group and Prof. Adrien Bartoli's website: https://encov.ip.uca.fr/ab/
+
  ---
 
  **References**
